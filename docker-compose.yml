@@ -6,12 +6,17 @@ services:
     ports:
       - "${PORT:-8001}:${PORT:-8001}"  # API port
       - "10001:3000"  # Next.js port
+      - "8000:8000"  # MCP port
     env_file:
       - .env
     environment:
       - PORT=${PORT:-8001}
       - NODE_ENV=production
       - SERVER_BASE_URL=http://localhost:${PORT:-8001}
+      - DEEPWIKI_API_BASE_URL=http://localhost:8001
+      - DEEPWIKI_MCP_HOST=0.0.0.0
+      - DEEPWIKI_MCP_PORT=8000
+      - DEEPWIKI_MCP_PATH=/mcp
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - LOG_FILE_PATH=${LOG_FILE_PATH:-api/logs/application.log}
     volumes:

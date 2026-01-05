@@ -71,13 +71,19 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY --from=py_deps /api/.venv /opt/venv
 COPY api/ ./api/
 
+# Copy MCP server
+COPY deepwiki-mcp/ ./deepwiki-mcp/
+
+# Install MCP server dependencies
+RUN python -m pip install --no-cache-dir ./deepwiki-mcp
+
 # Copy Node app
 COPY --from=node_builder /app/public ./public
 COPY --from=node_builder /app/.next/standalone ./
 COPY --from=node_builder /app/.next/static ./.next/static
 
 # Expose the port the app runs on
-EXPOSE ${PORT:-8001} 3000
+EXPOSE ${PORT:-8001} 3000 8000
 
 # Create a script to run both backend and frontend
 RUN echo '#!/bin/bash\n\
@@ -93,9 +99,21 @@ if [ -z "$OPENAI_API_KEY" ] || [ -z "$GOOGLE_API_KEY" ]; then\n\
   echo "You can provide them via a mounted .env file or as environment variables when running the container."\n\
 fi\n\
 \n\
+# MCP defaults (allow override via env/.env)\n\
+export DEEPWIKI_API_BASE_URL="${DEEPWIKI_API_BASE_URL:-http://localhost:${PORT:-8001}}"\n\
+export DEEPWIKI_MCP_HOST="${DEEPWIKI_MCP_HOST:-0.0.0.0}"\n\
+export DEEPWIKI_MCP_PORT="${DEEPWIKI_MCP_PORT:-8000}"\n\
+export DEEPWIKI_MCP_PATH="${DEEPWIKI_MCP_PATH:-/mcp}"\n\
+\n\
 # Start the API server in the background with the configured port\n\
 python -m api.main --port ${PORT:-8001} &\n\
+\n\
+# Start MCP server in the background\n\
+deepwiki-mcp &\n\
+\n\
+# Start Next.js server in the background\n\
 PORT=3000 HOSTNAME=0.0.0.0 node server.js &\n\
+\n\
 wait -n\n\
 exit $?' > /app/start.sh && chmod +x /app/start.sh
 

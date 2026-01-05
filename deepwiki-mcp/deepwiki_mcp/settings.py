@@ -16,7 +16,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    mcp_host: str = Field(default="127.0.0.1", validation_alias="DEEPWIKI_MCP_HOST")
+    mcp_host: str = Field(default="0.0.0.0", validation_alias="DEEPWIKI_MCP_HOST")
     mcp_port: int = Field(default=8000, validation_alias="DEEPWIKI_MCP_PORT")
     mcp_path: str = Field(default="/mcp", validation_alias="DEEPWIKI_MCP_PATH")
 
