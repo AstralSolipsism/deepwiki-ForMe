@@ -36,10 +36,19 @@
 git clone https://github.com/AstralSolipsism/deepwiki-ForMe.git
 cd deepwiki-ForMe
 
-# 创建包含API密钥的.env文件
+# 创建包含环境变量的 .env 文件（按你的模型/嵌入配置选择）
+# 生成模型：默认 provider=google，需要 GOOGLE_API_KEY（如果改用其他 provider，可不填）
 echo "GOOGLE_API_KEY=your_google_api_key" > .env
-echo "OPENAI_API_KEY=your_openai_api_key" >> .env
-# 可选：如果您想使用OpenRouter模型，添加OpenRouter API密钥
+
+# 可选：如果你想使用 OpenAI 模型（生成），添加：
+# echo "OPENAI_API_KEY=your_openai_api_key" >> .env
+# echo "OPENAI_BASE_URL=https://custom-openai-endpoint.com/v1" >> .env
+
+# 向量嵌入：本仓库默认 api/config/embedder.json 使用 OpenAI 兼容接口（SiliconFlow），需要：
+echo "SILICONFLOW_API_KEY=your_siliconflow_api_key" >> .env
+echo "SILICONFLOW_BASE_URL=https://your-openai-compatible-endpoint/v1" >> .env
+
+# 可选：如果您想使用 OpenRouter 模型（生成），添加：
 echo "OPENROUTER_API_KEY=your_openrouter_api_key" >> .env
 
 # 使用Docker Compose运行
@@ -64,10 +73,15 @@ docker-compose up
 在项目根目录创建一个`.env`文件，包含以下密钥：
 
 ```
-GOOGLE_API_KEY=your_google_api_key
-OPENAI_API_KEY=your_openai_api_key
-# 可选：如果您想使用OpenRouter模型，添加此项
-OPENROUTER_API_KEY=your_openrouter_api_key
+# 生成（LLM）按需配置：默认 provider=google
+GOOGLE_API_KEY=your_google_api_key               # 使用 Google Gemini 模型时需要（默认）
+# OPENAI_API_KEY=your_openai_api_key             # 使用 OpenAI 模型时需要（可选）
+# OPENAI_BASE_URL=https://custom-endpoint.com/v1 # 可选
+# OPENROUTER_API_KEY=your_openrouter_api_key     # 使用 OpenRouter 模型时需要（可选）
+
+# 嵌入（Embedding）按需配置：默认 api/config/embedder.json 使用 OpenAI 兼容接口（SiliconFlow）
+SILICONFLOW_API_KEY=your_siliconflow_api_key
+SILICONFLOW_BASE_URL=https://your-openai-compatible-endpoint/v1
 ```
 
 #### 步骤2：启动后端
@@ -311,13 +325,17 @@ DeepWiki 现在实现了灵活的基于提供者的模型选择系统，支持�
 每个提供商需要相应的 API 密钥环境变量：
 
 ```
-# API 密钥
-GOOGLE_API_KEY=你的谷歌API密钥        # 使用 Google Gemini 模型必需
-OPENAI_API_KEY=你的OpenAI密钥        # 使用 OpenAI 模型必需
-OPENROUTER_API_KEY=你的OpenRouter密钥 # 使用 OpenRouter 模型必需
+# 生成（LLM）按需配置：默认 provider=google
+GOOGLE_API_KEY=你的谷歌API密钥         # 使用 Google Gemini 模型时需要（默认）
+OPENAI_API_KEY=你的OpenAI密钥          # 使用 OpenAI 模型时需要（可选）
+OPENROUTER_API_KEY=你的OpenRouter密钥  # 使用 OpenRouter 模型时需要（可选）
 
-# OpenAI API 基础 URL 配置
-OPENAI_BASE_URL=https://自定义API端点.com/v1  # 可选，用于自定义 OpenAI API 端点
+# 嵌入（Embedding）按需配置：默认 api/config/embedder.json 使用 OpenAI 兼容接口（SiliconFlow）
+SILICONFLOW_API_KEY=你的_siliconflow_api_key
+SILICONFLOW_BASE_URL=你的_openai_兼容接口地址
+
+# OpenAI API 基础 URL 配置（仅当使用 OpenAI 或其他 OpenAI 兼容服务时）
+OPENAI_BASE_URL=https://自定义API端点.com/v1  # 可选
 ```
 
 ### 为服务提供者设计的自定义模型选择
@@ -345,13 +363,17 @@ OpenAI 客户端的 base_url 配置主要为拥有私有 API 渠道的企业用�
 每个提供商需要其相应的API密钥环境变量：
 
 ```
-# API密钥
-GOOGLE_API_KEY=your_google_api_key        # Google Gemini模型必需
-OPENAI_API_KEY=your_openai_api_key        # OpenAI模型必需
-OPENROUTER_API_KEY=your_openrouter_api_key # OpenRouter模型必需
+# 生成（LLM）按需配置：默认 provider=google
+GOOGLE_API_KEY=your_google_api_key         # 使用 Google Gemini 模型时需要（默认）
+OPENAI_API_KEY=your_openai_api_key          # 使用 OpenAI 模型时需要（可选）
+OPENROUTER_API_KEY=your_openrouter_api_key  # 使用 OpenRouter 模型时需要（可选）
 
-# OpenAI API基础URL配置
-OPENAI_BASE_URL=https://custom-api-endpoint.com/v1  # 可选，用于自定义OpenAI API端点
+# 嵌入（Embedding）按需配置：默认 api/config/embedder.json 使用 OpenAI 兼容接口（SiliconFlow）
+SILICONFLOW_API_KEY=your_siliconflow_api_key
+SILICONFLOW_BASE_URL=https://your-openai-compatible-endpoint/v1
+
+# OpenAI API基础URL配置（仅当使用 OpenAI 或其他 OpenAI 兼容服务时）
+OPENAI_BASE_URL=https://custom-api-endpoint.com/v1  # 可选
 
 # 配置目录
 DEEPWIKI_CONFIG_DIR=/path/to/custom/config/dir  # 可选，用于自定义配置文件位置
@@ -360,7 +382,7 @@ DEEPWIKI_CONFIG_DIR=/path/to/custom/config/dir  # 可选，用于自定义配置
 DEEPWIKI_AUTH_MODE=true  # 设置为 true 或 1 以启用授权模式
 DEEPWIKI_AUTH_CODE=your_secret_code # 当 DEEPWIKI_AUTH_MODE 启用时所需的授权码
 ```
-如果不使用ollama模式，那么需要配置OpenAI API密钥用于embeddings。其他密钥只有配置并使用使用对应提供商的模型时才需要。
+默认情况下，Embedding 需要配置 api/config/embedder.json 中占位符对应的环境变量（本仓库默认是 SILICONFLOW_API_KEY/SILICONFLOW_BASE_URL）；只有在你启用并使用相应提供商时才需要配置对应的生成模型 API Key。
 
 ## 授权模式
 
@@ -418,13 +440,14 @@ OpenAI 客户端的 base_url 配置主要为拥有私有 API 渠道的企业用�
 
 如果你希望使用 OpenAI 以外、但兼容 OpenAI 接口的 embedding 模型（如阿里巴巴 Qwen），请参考以下步骤：
 
-1. 用 `api/config/embedder_openai_compatible.json` 的内容替换 `api/config/embedder.json`。
-2. 在项目根目录的 `.env` 文件中，配置相应的环境变量，例如：
+1. 本仓库默认的 `api/config/embedder.json` 已是 OpenAI 兼容的 Embedding 配置示例（无需替换文件）。
+2. 在项目根目录的 `.env` 文件中，配置对应的环境变量（默认占位符名称为 `SILICONFLOW_API_KEY`/`SILICONFLOW_BASE_URL`）：
    ```
-   OPENAI_API_KEY=你的_api_key
-   OPENAI_BASE_URL=你的_openai_兼容接口地址
+   SILICONFLOW_API_KEY=你的_api_key
+   SILICONFLOW_BASE_URL=你的_openai_兼容接口地址
    ```
 3. 程序会自动用环境变量的值替换 embedder.json 里的占位符。
+4. 如果你更喜欢使用 `OPENAI_API_KEY`/`OPENAI_BASE_URL` 命名，也可以把 `api/config/embedder.json` 里的占位符改成对应名字即可。
 
 这样即可无缝切换到 OpenAI 兼容的 embedding 服务，无需修改代码。
 

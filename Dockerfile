@@ -92,11 +92,29 @@ if [ -f .env ]; then\n\
   export $(grep -v "^#" .env | xargs -r)\n\
 fi\n\
 \n\
-# Check for required environment variables\n\
-if [ -z "$OPENAI_API_KEY" ] || [ -z "$GOOGLE_API_KEY" ]; then\n\
-  echo "Warning: OPENAI_API_KEY and/or GOOGLE_API_KEY environment variables are not set."\n\
-  echo "These are required for DeepWiki to function properly."\n\
-  echo "You can provide them via a mounted .env file or as environment variables when running the container."\n\
+# Check for required environment variables (depends on your configuration)\n\
+# Default generator provider is Google; default embedder config uses an OpenAI-compatible endpoint via SILICONFLOW_*.\n\
+missing_env=0\n\
+\n\
+# Embeddings: by default, api/config/embedder.json expects SILICONFLOW_API_KEY and SILICONFLOW_BASE_URL.\n\
+embedder_type="${DEEPWIKI_EMBEDDER_TYPE:-openai}"\n\
+if [ "$embedder_type" = "openai" ]; then\n\
+  if [ -z "$SILICONFLOW_API_KEY" ] || [ -z "$SILICONFLOW_BASE_URL" ]; then\n\
+    echo "Warning: SILICONFLOW_API_KEY and/or SILICONFLOW_BASE_URL are not set (default embedding config expects them)."\n\
+    echo "If you customized api/config/embedder.json or DEEPWIKI_EMBEDDER_TYPE, you can ignore this warning."\n\
+    missing_env=1\n\
+  fi\n\
+fi\n\
+\n\
+# LLM generation: keys depend on provider. Default provider is Google.\n\
+if [ -z "$GOOGLE_API_KEY" ] && [ -z "$OPENAI_API_KEY" ] && [ -z "$OPENROUTER_API_KEY" ]; then\n\
+  echo "Warning: no LLM provider API key detected (GOOGLE_API_KEY/OPENAI_API_KEY/OPENROUTER_API_KEY)."\n\
+  echo "If you use a local provider like Ollama, you can ignore this warning."\n\
+  missing_env=1\n\
+fi\n\
+\n\
+if [ "$missing_env" = "1" ]; then\n\
+  echo "You can provide required variables via a mounted .env file or container environment variables."\n\
 fi\n\
 \n\
 # MCP defaults (allow override via env/.env)\n\
