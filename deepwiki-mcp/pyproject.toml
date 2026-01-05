@@ -1,0 +1,19 @@
+[project]
+name = "deepwiki-mcp"
+version = "0.1.0"
+description = "DeepWiki MCP server (HTTP bridge to existing DeepWiki FastAPI backend)."
+requires-python = ">=3.10"
+dependencies = [
+  # Official docs: pip install mcp / uv add mcp, and the `mcp` CLI is available via `uv run mcp ...`
+  "mcp",
+  "httpx>=0.27.0",
+  "pydantic>=2.0.0",
+  "pydantic-settings>=2.0.0",
+]
+
+[project.scripts]
+deepwiki-mcp = "deepwiki_mcp.server:main"
+
+[build-system]
+requires = ["hatchling>=1.24.0"]
+build-backend = "hatchling.build"

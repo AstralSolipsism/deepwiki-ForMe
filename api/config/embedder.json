@@ -1,0 +1,44 @@
+{
+  "embedder": {
+    "client_class": "OpenAIClient",
+    "initialize_kwargs": {
+      "api_key": "${SILICONFLOW_API_KEY}",
+      "base_url": "${SILICONFLOW_BASE_URL}"
+    },
+    "batch_size": 100,
+    "model_kwargs": {
+      "model": "Qwen/Qwen3-Embedding-8B",
+      "dimensions": 1024,
+      "encoding_format": "float"
+    }
+  },
+  "embedder_ollama": {
+    "client_class": "OllamaClient",
+    "batch_size": 500,
+    "model_kwargs": {
+      "model": "nomic-embed-text"
+    }
+  },
+  "embedder_google": {
+    "client_class": "GoogleGenAIClient",
+    "batch_size": 100,
+    "model_kwargs": {
+      "model": "text-embedding-004"
+    }
+  },
+  "embedder_bedrock": {
+    "client_class": "BedrockClient",
+    "batch_size": 500,
+    "model_kwargs": {
+      "model": "amazon.titan-embed-text-v2:0"
+    }
+  },
+  "retriever": {
+    "top_k": 5
+  },
+  "text_splitter": {
+    "split_by": "word",
+    "chunk_size": 400,
+    "chunk_overlap": 200
+  }
+}
